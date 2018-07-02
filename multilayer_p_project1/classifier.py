@@ -135,7 +135,8 @@ class MLPRegressor(MLP):
 					#print('go "slice" episodes back, ep to goto: ', ep - early_stop_slice_len)
 					#print('previous slice val err ', valE)
 					self.W_hid = all_weights[ep - early_stop_slice_len][0]
-					self.W_out = all_weights[ep - early_stop_slice_len][1]
+					self.W_firstmid = all_weights[ep - early_stop_slice_len][1]
+					self.W_out = all_weights[ep - early_stop_slice_len][2]
 					return (errors, REs)
 				temp_REs = []
 			errors.append(E)		#append only after we sure early stop did not interrupt

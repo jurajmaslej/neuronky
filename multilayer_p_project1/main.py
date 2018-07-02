@@ -24,24 +24,19 @@ class Controller:
 		self.test_label = data.test_label.T
 		self.test_label_raw = data.test_label_raw.T		#so that i wont need to dcode once again
 		self.validation_label_raw = data.validation_label_raw
-		#print("estim data sh", self.estimation_data.shape)
-		#print("estim lab sh", self.estimation_label.shape)
-		#print(self.estimation_data.T)
-		#print(self.estimation_data)
 		
 		self.estimation_errors = dict()
 		self.validation_errors = dict()
 		
 		self.normalize_data()
 		
-		#model, best_key = self.test_model_params()
-		model, outputs_create_m = self.create_model()
-		#error, outputs = self.test_on_test_data(model = None, best_key = best_key)
-		#outputs = np.array([[0,0,1],[1,0,0],[0,1,0],[1,0,0]])
+		model, best_key = self.test_model_params()
+		#model, outputs_create_m = self.create_model()
+		error, outputs = self.test_on_test_data(model = model, best_key = best_key)
 		#print(outputs)
-		#self.confusion_matrix(outputs, best_key, 'test')
+		self.confusion_matrix(outputs, best_key, 'test')
 		
-		#self.save_val_and_est_errors()
+		self.save_val_and_est_errors()
 		
 	def save_val_and_est_errors(self):
 		#est_errors_f = open('estimation_errors.txt', 'w')
@@ -76,8 +71,10 @@ class Controller:
 		print('test error ', error)
 		print('test outputs shape ', outputs.shape)
 		plot_reg_density('Density', self.test_data, self.test_label, outputs, block=False)
-		plot_errors('Model loss', trainREs[0], block=False)
-		
+		try:
+			plot_errors('Model loss', trainREs[0], block=False)
+		except:
+			print('used model from test params')	#last min fix
 		return (error, outputs)
 	
 	def confusion_matrix(self, outputs, params, target_set):
@@ -155,7 +152,7 @@ class Controller:
 					print('validation err for key ', key, ' err: ', error)
 					if error < min_error:		#not <= but < to favour simpler models
 						min_error = error
-						best_key =  prev_key
+						best_key =  prev_key	#not only =key ?
 						best_model = model
 						print('new best found ', best_key ,', with error ', error)
 					self.confusion_matrix(outputs, best_key, 'validation')
@@ -181,11 +178,10 @@ class Controller:
 		outputs = model.predict(self.validation_data)
 		outputs = data_handler.Handler().decode_labels(outputs).T		#3,1600
 		self.evaluate_model_tot_errors(self.validation_label, outputs)
-		
-		#return model
 	
-		#plot_reg_density('Density', self.validation_data, self.validation_label, outputs, block=False)
-		#plot_errors('Model loss', trainREs[0], block=False)
+		plot_reg_density('Density', self.validation_data, self.validation_label, outputs, block=False)
+		plot_errors('Model loss', trainREs[0], block=False)
+		
 		return (model, outputs)
 	
 	

@@ -70,10 +70,11 @@ class MLP():
         y, b, output_f_mid, f_mid, h, a = self.forward(x)
 
         g_out = (d - y) * self.df_out(b) # 
+        #print('a sh ', a.shape)
+        #print('f mid sh ', f_mid.shape)
+        g_mid = np.dot(self.W_out.T[:-1], g_out) * self.df_hid(f_mid)	#should be f_mid?, was "a"
         
-        g_mid = np.dot(self.W_out.T[:-1], g_out) * self.df_hid(a)
-        
-        g_hid = np.dot(self.W_firstmid.T[:-1], g_mid) * self.df_hid(f_mid) # 
+        g_hid = np.dot(self.W_firstmid.T[:-1], g_mid) * self.df_hid(a) # 
         #g_hid = np.dot(self.W_out.T[:-1], g_out) * self.df_hid(a) # 
 
         #dW_out = np.outer(g_out, augment(h)) # out of output layer -> weights update in fact
